@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>{% block title %} {{ 'Громада'|trans }} {% endblock %}</title>
+    <meta name="keywords" content="Держгеокадастр, Об’єднані територіальні громади"/>
+    <meta name="description" content="Держгеокадастр, Об’єднані територіальні громади"/>
+    {% block stylesheets %} {% endblock %}
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="shortcut icon" href="{{ asset('bundles/gromada/img/fav/favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{asset('bundles/gromada/img/fav/favicon.ico')}}" type="image/x-icon">
+</head>
+<body>
+{% block body %}
+    {% block main %}
+    {% endblock %}
+{% endblock %}
+{% block javascripts %}{% endblock %}
+</body>
+</html>

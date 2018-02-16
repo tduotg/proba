@@ -1,0 +1,160 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+    - { resource: "@GromadaBundle/Resources/config/services.yml" }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: uk
+    app_locales: uk|en
+
+framework:
+    translator: { fallbacks: ['%locale%'] }
+    templating:
+        engines: ['twig']
+    #esi: ~
+    #translator: { fallbacks: ['%locale%'] }
+    secret: '%secret%'
+    router:
+        resource: '%kernel.project_dir%/app/config/routing.yml'
+        strict_requirements: ~
+    form: ~
+    csrf_protection: ~
+    validation: { enable_annotations: true }
+    serializer: { enable_annotations: true }
+    default_locale: '%locale%'
+    trusted_hosts: ~
+    session:
+        # https://symfony.com/doc/current/reference/configuration/framework.html#handler-id
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+    fragments: ~
+    http_method_override: true
+    assets: ~
+    php_errors:
+        log: true
+
+# Twig Configuration
+twig:
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver: pdo_pgsql
+        host: '%database_host%'
+        port: '%database_port%'
+        dbname: '%database_name%'
+        user: '%database_user%'
+        password: '%database_password%'
+        charset: UTF8
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: '%kernel.project_dir%/var/data/data.sqlite'
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #path: '%database_path%'
+        types:
+            geography:
+                class: 'Jsor\Doctrine\PostGIS\Types\GeographyType'
+                commented: false
+            geometry:
+                class: 'Jsor\Doctrine\PostGIS\Types\GeometryType'
+                commented: false
+            raster:
+                class: 'Jsor\Doctrine\PostGIS\Types\RasterType'
+                commented: false
+    orm:
+        auto_generate_proxy_classes: '%kernel.debug%'
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        dql:
+            string_functions:
+                ST_AsText: Jsor\Doctrine\PostGIS\Functions\ST_AsText
+                ST_AsEWKT: Jsor\Doctrine\PostGIS\Functions\ST_AsEWKT
+                ST_GeometryFromText: Jsor\Doctrine\PostGIS\Functions\ST_GeometryFromText
+                ST_GeomFromText: Jsor\Doctrine\PostGIS\Functions\ST_GeomFromText
+                ST_GeomFromEWKT: Jsor\Doctrine\PostGIS\Functions\ST_GeomFromEWKT
+                ST_XMax: Jsor\Doctrine\PostGIS\Functions\ST_XMax
+                ST_YMax: Jsor\Doctrine\PostGIS\Functions\ST_YMax
+                ST_XMin: Jsor\Doctrine\PostGIS\Functions\ST_XMin
+                ST_YMin: Jsor\Doctrine\PostGIS\Functions\ST_YMin                
+                ST_Transform: Jsor\Doctrine\PostGIS\Functions\ST_Transform
+                ST_SetSRID: Jsor\Doctrine\PostGIS\Functions\ST_SetSRID
+                ST_Point: Jsor\Doctrine\PostGIS\Functions\ST_Point
+                ST_X: Jsor\Doctrine\PostGIS\Functions\ST_X
+                ST_Y: Jsor\Doctrine\PostGIS\Functions\ST_Y
+                ST_Intersects: Jsor\Doctrine\PostGIS\Functions\ST_Intersects
+                ST_Buffer: Jsor\Doctrine\PostGIS\Functions\ST_Buffer
+                ST_MakePoint: Jsor\Doctrine\PostGIS\Functions\ST_MakePoint
+                ST_Distance: Jsor\Doctrine\PostGIS\Functions\ST_Distance
+                ST_Within: Jsor\Doctrine\PostGIS\Functions\ST_Within
+                ST_Multi: Jsor\Doctrine\PostGIS\Functions\ST_Multi
+                ST_IsValid: Jsor\Doctrine\PostGIS\Functions\ST_IsValid
+# Swiftmailer Configuration
+swiftmailer:
+    transport: '%mailer_transport%'
+    host: '%mailer_host%'
+    username: '%mailer_user%'
+    password: '%mailer_password%'
+    spool: { type: memory }
+fos_user:
+    db_driver: orm # other valid values are 'mongodb' and 'couchdb'
+    firewall_name: main
+    user_class: GromadaBundle\Entity\User
+    from_email:
+        address: "%mailer_user%"
+        sender_name: "%mailer_user%"
+
+fos_elastica:
+    default_manager: orm
+    serializer: ~
+    clients:
+        default: { host: 192.168.33.37, port: 9200 }
+    serializer: ~
+    indexes:
+        commune:
+            settings:
+                index:
+                    analysis:
+                        analyzer:
+                            my_analyzer:
+                                type: custom
+                                tokenizer: lowercase
+                                filter   : [my_ngram]
+                        filter:
+                            my_ngram:
+                                type: "edge_ngram"
+                                min_gram: 1
+                                max_gram: 20
+            types:
+                gromada:
+                    properties:
+                        nameUa: { boost: 3, analyzer: my_analyzer }
+                    persistence:
+                        elastica_to_model_transformer:
+                            ignore_missing: true
+                        # the driver can be orm, mongodb, phpcr or propel
+                        # listener and finder are not supported by
+                        # propel and should be removed
+                        driver: orm
+                        model: GromadaBundle\Entity\Gromada
+                        provider: ~
+                        finder: ~
+stof_doctrine_extensions:
+    orm:
+        default:
+            timestampable: true 
+monolog:
+    channels: ['gromada_users']   
+    handlers:
+        gromada_users:
+            # log all messages (since debug is the lowest level)
+            level:    debug
+            type:     stream
+            path:     '%kernel.logs_dir%/users.log'
+            channels: [gromada_users]    
+                   

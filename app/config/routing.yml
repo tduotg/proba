@@ -1,0 +1,31 @@
+gromada:
+    resource: "@GromadaBundle/Controller/"
+    type:     annotation
+    prefix:   /{_locale}
+    requirements:
+        _locale: '%app_locales%'
+    defaults:
+        _locale: '%locale%'
+
+homepage:
+    path: /{_locale}
+    requirements:
+        _locale: '%app_locales%'
+    defaults:
+        _controller: GromadaBundle:Map:index
+        template:    GromadaBundle:Map:index.html.twig
+        _locale:     '%locale%'
+
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+
+setLocale:
+    path: /setLocale
+    defaults: { _controller: GromadaBundle:Map:setLocale }
+    condition: "request.isXmlHttpRequest()"
+#app:
+#    resource: '@AppBundle/Controller/'
+#    type: annotation
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+    prefix:   /{_locale}

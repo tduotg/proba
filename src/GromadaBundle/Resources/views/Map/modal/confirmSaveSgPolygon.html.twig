@@ -1,0 +1,34 @@
+<div class="modal fade" id="confirmSaveSgModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{'Зберегти полігон'|trans}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {{ form_start(gform, {'name': 'newsgpolygon', 'attr': {'id': 'newsgpolygon'}}) }}
+            <div class="modal-body">
+                {{ form_errors(gform) }}
+                {{ form_row(gform.gromada_koatuu) }}
+                {{ form_row(gform.geom) }}
+                <div class="caption">
+                    {{ 'Назва громади'|trans }}:
+                    <span class="font-parameter-500 ">{{ data.gromadaName }}</span>
+                </div>
+                <div class="caption">
+                    {{ 'Площа'|trans }}:
+                    <span id = 'caption_area' class="font-parameter-500 "></span>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">{{'Скасувати'|trans}}</button>
+                {{ form_widget(gform.submit, { 'label': 'Зберегти', 'attr': {'class': 'btn btn-success'} })}}
+
+            </div>
+            {{ form_end(gform) }}
+        </div>
+    </div>
+</div>

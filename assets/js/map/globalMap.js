@@ -1,0 +1,13 @@
+require('ol3-google-maps');
+require('bootstrap-3-typeahead');
+bootbox = require('bootbox');
+require('../../lib/bxslider/dist/jquery.bxslider.min.css');
+require('../../lib/bxslider/dist/jquery.bxslider.min');
+require('../../lib/getmdl-select/getmdl-select.min.js');
+require('../../lib/getmdl-select/getmdl-select.min.css');
+require('../../css/map/map.scss');
+require('../../js/map/initialLayers');
+require('../../js/map/visualization');
+require('../../js/map/app');
+require('../../js/map/drawPlot');
+require('../../js/map/elasticSearch');

@@ -1,0 +1,15 @@
+{% extends '::base.html.twig' %}
+{% block main %}
+        {% block fos_user_content %}
+        {% endblock %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/manifest.js') }}"></script>
+    <script src="{{ asset('build/vendor.js') }}"></script>
+    <script src="{{ asset('build/login.js') }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('build/login.css') }}">
+{% endblock %}

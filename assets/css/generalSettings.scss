@@ -1,0 +1,15 @@
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+$fa-font-path: "~font-awesome/fonts";
+
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+@import "~font-awesome/scss/font-awesome";
+
+$base-color: #0093C2;
+
+:focus {
+  outline: none !important;
+}
+.modal-title{
+  float: left;
+  font-size: 1.4em;
+}

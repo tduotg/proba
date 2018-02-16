@@ -1,0 +1,450 @@
+{% extends '::base.html.twig' %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=cyrillic,cyrillic-ext">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.4/css/ol.css" type="text/css">
+{#    {% if is_granted('ROLE_USER') %}
+    {% include '@Gromada/Map/createrbuttons.css' %}
+{% else %}
+    {% include '@Gromada/Map/defaultbuttons.css' %}
+{% endif %}#}
+    <link rel="stylesheet" href="{{ asset('build/map.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/manifest.js') }}"></script>
+    <script src="{{ asset('build/vendor.js') }}"></script>
+    <script
+            src='https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyADCA0LMlMFz6z6SqQkrxnEzao8jJAyDEQ&libraries=places'>
+    </script>
+    <script defer src='https://code.getmdl.io/1.3.0/material.min.js'></script>
+    <script src="https://openlayers.org/en/v4.6.4/build/ol.js"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    <script src="{{ asset('build/map.js') }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-5422036-9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-5422036-9');
+    </script>
+{% endblock %}
+
+{% block body -%}
+    <div class="head_block">
+        <div class="menu_button">
+            <button class="mdl-button mdl-js-button mdl-button--icon filter_list open_menu_but">
+                <i class="material-icons">menu</i>
+            </button>
+        </div>
+    </div>
+    <div class="head_block_logo">
+        <a href="#" class="company_logo">
+            <img src="{{ asset('bundles/gromada/img/nsci.png') }}"> {{ 'Громада'|trans }}
+        </a>
+
+
+
+    </div>
+    <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50 is-visible"
+         aria-hidden="false">
+        <div class="mdl-layout-title brand">
+            <a href="#" class="company_logo">
+                {{ 'ГРОМАДА'|trans }}
+            </a>
+            <button class="mdl-button mdl-js-button mdl-button--icon  open_menu_but">
+                <i class="material-icons">keyboard_arrow_left</i>
+            </button>
+        </div>
+        <div class="sidebar_search_container ">
+            <div class="sidebar_search_block open">
+                <i class="material-icons clear_icon sidebar_clear_block_button">clear</i>
+                <div id="searchcont">
+                    <input type="text" class="typeahead form-control" data-provide="typeahead" id="sidebar_search_input"
+                           placeholder="{{ 'Пошук по громадам'|trans }}">
+                </div>
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect btn_small sidebar_search_block_button"
+                        id="search_by_gromada">
+                    <i class="material-icons">search</i>
+                </button>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="search_by_gromada">
+                    {{ 'Пошук'|trans }}
+                </div>
+            </div>
+        </div>
+
+        {#Тултіпи для шарів#}
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="orto10000">
+            {{ 'Ортофотоплани'|trans }} {{ 'масштабу'|trans }}
+            1:10000, {{ 'які створені в рамках проекту світового банку'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="orto2000">
+            {{ 'Ортофотоплани'|trans }} {{ 'масштабу'|trans }}
+            1:2000, {{ 'які створені в рамках проекту світового банку'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="gryntSidebar">
+            {{ 'Карта грунтів України'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorVinSidebar">
+            {{ 'Векторний план'|trans }} {{ 'масштабу'|trans }} 1:2000
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vinOrtoSidebar">
+            {{ 'Ортофотоплан'|trans }} {{ 'масштабу'|trans }} 1:2000
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="topoVinSidebar">
+            {{ 'Топографічний план'|trans }} {{ 'масштабу'|trans }} 1:2000
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorGromSidebar">
+            {{ 'Межі міст'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorSRSidebar">
+            {{ 'Межі сільських рад'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorCitiesSidebar">
+            {{ 'Межі громад'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorPlotsSidebar">
+            {{ 'Ділянки'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorSoilsSidebar">
+            {{ 'Грунти'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="parcelSidebar">
+            {{ 'Земельні ділянки'|trans }} ({{ 'Публічна кадастрова карта'|trans }})
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="vectorSgrayonSidebar">
+            {{ 'Сільськогосподарські райони'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="aerophotography">
+            {{ 'Аерофотозйомка, проведена в рамках проекту світового банку'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="gromada_layers">
+            {{ 'Громада'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="orto10000sidebar">
+            {{ 'Ортофотоплани масштабу 1:10000, які створені в рамках проекту світового банку'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="dynamicSidebar">
+            {{ 'Векторна карта з OpenStreetMap'|trans }}
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="geodeticSidebar">
+            {{ 'Дані ДГМ по матеріалам НДІГК'|trans }}
+        </div>
+        {#Тултіпи для шарів(end)#}
+
+        <div class="layersAll">
+            <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+                <div class="level_menu">
+                    <a id='gromada_layers' class="mdl-navigation__link mdl-navigation__level1" href="#">
+                        <div class="layersOff">
+                            <label class = "layersOffCheck mdl-checkbox mdl-js-checkbox" for = "checkbox2">
+                                <input type = "checkbox" id = "checkbox2"
+                                       class = "mdl-checkbox__input" checked>
+                            </label>
+                        </div>
+                        <i class="mdl-color-text--blue-grey-400 material-icons"
+                           role="presentation">location_city</i>{{ 'Громади'|trans }}</a>
+                    <div class="mdl-navigation__level2" style="display: block">
+                        <a id='parcelSidebar' class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                           href="#parcelSidebar">
+                            <i class="mdl-color-text--blue-grey-400 material-icons"
+                               role="presentation">layers</i>{{ 'Кадастровий поділ'|trans }}
+                        </a>
+                        <a id='vectorCitiesSidebar' class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                           href="#vectorCitiesSidebar">
+                            <i class="mdl-color-text--blue-grey-400 material-icons"
+                               role="presentation">layers</i>{{ 'Межі міст'|trans }}
+                        </a>
+                        <a id='vectorSRSidebar' class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                           href="#vectorSRSidebar">
+                            <i class="mdl-color-text--blue-grey-400 material-icons"
+                               role="presentation">layers</i>{{ 'Межі сільських рад'|trans }}
+                        </a>
+                        <a id='vectorGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                           href="#vectorGromSidebar">
+                            <i class="mdl-color-text--blue-grey-400 material-icons"
+                               role="presentation">layers</i>{{ 'Межі громад'|trans }}
+                        </a>
+                        <a id='vectorPlotsSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                           href="#vectorPlotsSidebar">
+                            <i class="mdl-color-text--blue-grey-400 material-icons"
+                               role="presentation">layers</i>{{ 'Ділянки'|trans }}
+                        </a>
+                        {% if is_granted('ROLE_USER') %}
+                         <a id='vectorSgPlotsSidebar'
+                            class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                            href="#vectorSgPlotsSidebar">
+                             <i class="mdl-color-text--blue-grey-400 material-icons"
+                                role="presentation">layers</i>{{ 'СГ ділянки'|trans }}
+                         </a>  
+                         {% endif %}
+                         {#<a id='vectorSoilsSidebar' class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                            href="#vectorSoilsSidebar">
+                             <i class="mdl-color-text--blue-grey-400 material-icons"
+                                role="presentation">layers</i>{{ 'Грунти'|trans }}
+                         </a>
+                         <a id='vectorSgrayonSidebar' class="mdl-navigation__link legend-tooltip mdl-navigation__level3"
+                            href="#vectorSgrayonSidebar">
+                             <i class="mdl-color-text--blue-grey-400 material-icons"
+                                role="presentation">layers</i>{{ 'Сільськогосподарські райони'|trans }}
+                         </a>#}
+                    </div>
+                    <a class="mdl-navigation__link mdl-navigation__level1 " href="#">
+                        <i class="mdl-color-text--blue-grey-400 material-icons"
+                           role="presentation">assignment</i>{{ 'Зразки документів'|trans }}</a>
+                    <div class="mdl-navigation__level2">
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/act_of_acceptance_of_transfer.docx') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Акт приймання-передачі земельних ділянок'|trans }}
+                        </a>
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/addition_to_the_act.docx') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Додаток до Акту'|trans }}
+                        </a>
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/transfer_to_ownership_117.doc') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Наказ про передачу земельної ділянки'|trans }}
+                        </a>
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/petition.doc') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Клопотання'|trans }}
+                        </a>
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/decision.doc') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Рішення'|trans }}
+                        </a>
+                        <a id='rastrTopoGromSidebar'
+                           class="mdl-navigation__link legend-tooltip mdl-navigation__level3 document_download"
+                           href="{{ asset('bundles/gromada/doc/memorandum_of_cooperation.doc') }}" target="_blank">
+                            <i class="mdl-color-text--blue-grey-400 material-icons">description</i>{{ 'Меморандум про співпрацю'|trans }}
+                        </a>
+                    </div>
+                    <a id='plan_doc' class="mdl-navigation__link mdl-navigation__level1"  href="{{ asset('bundles/gromada/doc/plan.pdf') }}" target="_blank">
+                        <i class="mdl-color-text--blue-grey-400 material-icons">description</i>
+                        {{ 'План-графік'|trans }}
+                    </a>
+                    <a id='question' class="mdl-navigation__link mdl-navigation__level1" data-toggle="modal"
+                       data-target="#faqModal" href="#">
+                        <i class="mdl-color-text--blue-grey-400 material-icons"
+                           role="presentation">help
+                        </i>
+                        {{ 'Питання-відповіді'|trans }}
+                    </a>
+                    <div class="tel">
+                        <img src="{{ asset('bundles/gromada/img/tel.png') }}" >
+                    </div>
+                </div>
+
+            </nav>
+        </div>
+        <div class="bid_list">
+            <div class="bid_list_container">
+                <div class="bid_list_button">
+                    <i class="material-icons">keyboard_arrow_up</i>
+                </div>
+                <div class="bid_list-content-fix">
+                    <div class="bid_list-content">
+                        <div class="zoomOff">
+                            <label class="mdl-checkbox mdl-js-checkbox" for="checkbox-zoom">
+                                <span class="mdl-checkbox__label">{{ 'Відображати зум'|trans }}</span>
+                                <input type="checkbox" id="checkbox-zoom" class="mdl-checkbox__input" checked>
+                            </label>
+                        </div>
+                        <div class="centerOff">
+                            <label class="mdl-checkbox mdl-js-checkbox" for="map-сenter">
+                                <span class="mdl-checkbox__label">{{ 'Відображати центр карти'|trans }}</span>
+                                <input type="checkbox" id="map-сenter" class="mdl-checkbox__input" checked>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bid_list-footer">
+                <a href="#" class="btn">{{ 'НАЛАШТУВАННЯ'|trans }}</a>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div id="snackbar_container" class="mdl-js-snackbar mdl-snackbar">
+        <div class="mdl-snackbar__text"></div>
+        <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+
+
+    <div class="right_menu close">
+        <div class="right_menu_container">
+            <div class="right_menu_button">
+                <i class="material-icons">chevron_right</i>
+            </div>
+            <div class='info'>
+                <div class="info-slider" id="information">
+                </div>
+            </div>
+            <div class="right_menu_footer-block">
+                <div class="control_bttons">
+                    <div class="control_i">
+                        <button class="mdl-button mdl-js-button mdl-button--icon filter_list btn">
+                            <i class="material-icons">sms_failed</i>
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--icon filter_list btn">
+                            <i class="material-icons">share</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% if is_granted('ROLE_USER') %}
+    {% include '@Gromada/Map/createrbuttons.html.twig' %}
+{% else %}
+    {% include '@Gromada/Map/defaultbuttons.html.twig' %}
+{% endif %}
+
+
+    <div class="osm-copyright">©<a target="_blank" href="http://www.openstreetmap.org/copyright">{{ 'Участники'|trans }}
+            OpenStreetMap</a></div>
+
+    <div class="map_mode_select">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+            <input class="mdl-textfield__input " type="text" id="map_mode" readonly
+                   value="{{ 'Оглядова карта України'|trans|raw }}">
+            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+            <ul for="map_mode" class="mdl-menu  mdl-menu--bottom-left mdl-js-menu ">
+                <li id="viewMap" class="mdl-menu__item" data-val="pub">{{ 'Оглядова карта України'|trans|raw }}</li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="viewMap">
+                    {{ 'Оглядова карта України'|trans|raw }} {{ 'масштабу'|trans }} 1:100000
+                </div>
+                <li id='orto10000base' class="mdl-menu__item" data-val="kiev2006">{{ 'Ортофотоплани'|trans|raw }}, 2006
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="orto10000base">
+                    {{ 'Ортофотоплани'|trans }} {{ 'масштабу'|trans }}
+                    1:10000, {{ 'які створені в рамках проекту світового банку'|trans }}
+                </div>
+                <li id='topoUA' class="mdl-menu__item" data-val="topoUA">{{ 'Топографічна карта України'|trans }}
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="topoUA">
+                    {{ 'Топографічна карта України'|trans }} {{ 'масштабу'|trans }} 1:100000
+                </div>
+                <hr>
+                <li id='osmBase' class="mdl-menu__item" data-clipboard-text="https://www.openstreetmap.org/"
+                    data-val="osm">Open Street Map
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="osmBase">
+                    {{ 'Веб-картографічний проект по створенню детальної, вільної і безкоштовної географічної карти світу'|trans }}
+                </div>
+                <li id='osmCycle' class="mdl-menu__item" data-val="OpenCycleMap">Open Street Cycle Map
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="osmCycle">
+                    {{ 'Веб-картографічний проект по створенню детальної, вільної і безкоштовної географічної карти світу'|trans }}
+                </div>
+                <li id='googleSatelit' class="mdl-menu__item" data-val="google">Google Satellite
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="googleSatelit">
+                    {{ 'Набір додатків, побудованих на основі безкоштовного картографічного сервісу і технологій, які надає компанія Google.'|trans }}
+                </div>
+                <li id='googleHybrid' class="mdl-menu__item" data-val="googlehybrid">Google Hybrid</li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="googleHybrid">
+                    {{ 'Набір додатків, побудованих на основі безкоштовного картографічного сервісу і технологій, які надає компанія Google.'|trans }}
+                </div>
+                <hr>
+                <li id='emptyLayerR' class="mdl-menu__item" data-val="emptyRelief">{{ 'Порожній шар (рельєф)'|trans }}
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="emptyLayerR">
+                    {{ 'Базовий шар рельєфу'|trans }}
+                </div>
+                <li id='emptyLayer' class="mdl-menu__item" data-val="emptyLayer">{{ 'Порожній шар'|trans }}
+                </li>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="emptyLayer">
+                    {{ 'Базовий порожній шар'|trans }}
+                </div>
+
+            </ul>
+        </div>
+        <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="map_mode">
+            {{ 'Обрати підоснову'|trans }}
+        </div>
+    </div>
+    <div class="right_container">
+        <div class="main_search_container ">
+            <div class="main_search_block">
+                <i class="material-icons clear_icon main_clear_block_button">clear</i>
+                <input type="text" placeholder="{{ 'Пошук'|trans }}" id="main_search_input">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab bg_white mdl-js-ripple-effect btn_small search_block_button main_search_block_button"
+                        id="main_tt8">
+                    <i class="material-icons">search</i>
+                </button>
+                <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="main_tt8">
+                    {{ 'Пошук'|trans }}
+                </div>
+            </div>
+        </div>
+        <div class="account_container ">
+            <div class="account_block">
+                {#                <button class="mdl-button mdl-js-button mdl-button--icon btn_theme_hover_color" id="main_tt10">#}
+                {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('fos_user_security_logout') }}" class="mdl-button mdl-js-button mdl-button--icon btn_theme_hover_color" id="main_tt10">
+                        <i class="material-icons">directions_walk</i>
+                    </a>
+                    <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="main_tt10">
+                        {{'Вийти'|trans}}, {{ app.user.username }}
+                    </div>
+                {% else %}
+                    <a href="{{ path('fos_user_security_login') }}" class="mdl-button mdl-js-button mdl-button--icon btn_theme_hover_color" id="main_tt10">
+                        <i class="material-icons">account_circle</i>
+                    </a>
+                    <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="main_tt10">
+                        {{'Авторизуватись'|trans}}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="language_container ">
+            <div class="language_block">
+                {% if app.request.getLocale() == 'en' %}
+                    <button class="mdl-button mdl-js-button mdl-button--icon btn_theme_hover_color" id="main_tt11">
+                        <i class="material-icons">EN</i>
+                    </button>
+                    <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="main_tt11">
+                        English
+                    </div>
+                {% else %}
+                    <button class="mdl-button mdl-js-button mdl-button--icon btn_theme_hover_color" id="main_tt11">
+                        <i class="material-icons">UA</i>
+                    </button>
+                    <div class="mdl-tooltip main_mdl-tooltip" data-mdl-for="main_tt11">
+                        Українською
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="coordinate">
+        B:<span class="x"></span>,
+        L:<span class="y"></span>
+    </div>
+    <i class="mdl-color-text--blue-grey-400 material-icons map-center" role="presentation">add</i>
+    <div id="mapView" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;"></div>
+    <div id="scale-line" class="scale-line"></div>
+    <i id="location" class="material-icons">gps_fixed</i>
+    <i id="searchLocation" class="material-icons">location_on</i>
+
+    {% include 'GromadaBundle:Map/modal:faq.html.twig' %}
+    {% include 'GromadaBundle:Map/modal:confirmdown.html.twig' %}
+    {% include 'GromadaBundle:Map/modal:errorAccess.html.twig' %}
+    {% include 'GromadaBundle:Map/modal:remsgdown.html.twig' %}
+    
+{% endblock body %}
